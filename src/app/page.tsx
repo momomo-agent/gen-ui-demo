@@ -27,7 +27,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
@@ -36,11 +36,19 @@ export default function Home() {
     setMessages((prev) => [...prev, { role: "user", text: userMsg }]);
     setLoading(true);
 
-    const data = resolveIntent(userMsg);
-    setMessages((prev) => [
-      ...prev,
-      { role: "os", mode: data.mode, label: data.label, spec: data.spec },
-    ]);
+    try {
+      const res = await fetch("/api/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: userMsg }),
+      });
+      const data = await res.json();
+      setMessages((prev) => [...prev, { role: "os", mode: data.mode, label: data.label, spec: data.spec }]);
+    } catch {
+      // Fallback to local mock
+      const data = resolveIntent(userMsg);
+      setMessages((prev) => [...prev, { role: "os", mode: data.mode, label: data.label, spec: data.spec }]);
+    }
     setLoading(false);
   }
 
