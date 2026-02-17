@@ -115,4 +115,9 @@ export const { registry } = defineRegistry(catalog, {
     ),
     Separator: () => <hr className="border-zinc-200 dark:border-zinc-700" />,
   },
+  actions: {
+    confirm: async () => { alert("已确认！"); },
+    select_item: async () => { alert("已选择！"); },
+    filter: async () => { alert("已筛选！"); },
+  },
 });
