@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Renderer } from "@json-render/react";
+import { JSONUIProvider } from "@json-render/react";
 import { registry } from "./registry";
 import { resolveIntent } from "./engine";
 
@@ -66,7 +67,9 @@ export default function Home() {
                 )}
                 {msg.spec ? (
                   <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                    <Renderer spec={msg.spec} registry={registry} />
+                    <JSONUIProvider registry={registry}>
+                      <Renderer spec={msg.spec} registry={registry} />
+                    </JSONUIProvider>
                   </div>
                 ) : (
                   <div className="text-zinc-600">{msg.text}</div>
