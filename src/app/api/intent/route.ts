@@ -19,6 +19,8 @@ const SYSTEM_PROMPT = `你是 IntentOS 的意图引擎。用户输入意图，�
 
 设计原则：简洁实用，用 emoji，中文`;
 
+export const maxDuration = 30;
+
 export async function POST(req: NextRequest) {
   try {
     const { input } = await req.json();
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: process.env.ANTHROPIC_MODEL || "claude-opus-4-6",
-        max_tokens: 1024,
+        max_tokens: 2048,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: input }],
       }),
