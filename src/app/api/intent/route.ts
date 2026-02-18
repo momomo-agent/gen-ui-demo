@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SYSTEM_PROMPT = `你是 IntentOS 的意图引擎。用户输入意图，你返回 JSON：
+const SYSTEM_PROMPT = `你是 IntentOS 的意图引擎。用户输入意图，你返回严格 JSON（不要 markdown）：
 
 1. 判断 handoff 模式：
    - osHandles: OS 直接完成（简单明确）
@@ -10,42 +10,43 @@ const SYSTEM_PROMPT = `你是 IntentOS 的意图引擎。用户输入意图，�
 2. 生成 json-render spec（flat format: root + elements map）
 
 可用组件：Card(title), Stack(direction:vertical|horizontal, gap:sm|md|lg), Heading(text, level), Text(text, size:sm|md|lg, color:default|muted, weight:normal|semibold), Badge(text), Button(label, action), Radio(name, options:[{label,value}]), Separator()
-
 可用 actions: confirm, select_item, filter
 
-返回严格 JSON：
-{"mode":"osHandles|osToUser|osAsksUser","label":"中文描述","spec":{"root":"...","elements":{...}}}
+每个 element 必须有 type, props, children 三个字段！props 是对象。
 
-设计原则：简洁实用，用 emoji，中文，合理嵌套 Card+Stack`;
+示例：
+{"mode":"osHandles","label":"OS 直接处理","spec":{"root":"c1","elements":{"c1":{"type":"Card","props":{"title":"☕ 确认"},"children":["t1","b1"]},"t1":{"type":"Text","props":{"text":"拿铁 ¥32","size":"md"},"children":[]},"b1":{"type":"Button","props":{"label":"确认","action":"confirm"},"children":[]}}}}
+
+设计原则：简洁实用，用 emoji，中文`;
 
 export async function POST(req: NextRequest) {
   try {
     const { input } = await req.json();
-    const res = await fetch(process.env.OPENAI_BASE_URL + "/chat/completions", {
+    const res = await fetch(process.env.ANTHROPIC_BASE_URL + "/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "x-api-key": process.env.ANTHROPIC_API_KEY!,
+        "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: input },
-        ],
-        temperature: 0.3,
-        response_format: { type: "json_object" },
+        model: process.env.ANTHROPIC_MODEL || "claude-opus-4-6",
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: input }],
       }),
     });
     const json = await res.json();
-    const text = json.choices?.[0]?.message?.content || "{}";
+    let text = (json.content?.[0]?.text || "").trim();
+    // Strip markdown code fences if present
+    text = text.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
     return NextResponse.json(JSON.parse(text));
   } catch (e: any) {
     return NextResponse.json({
       mode: "osHandles", label: "出错了",
       spec: { root: "c", elements: {
         c: { type: "Card", props: { title: "⚠️" }, children: ["t"] },
-        t: { type: "Text", props: { text: e.message || "未知错误", size: "md" }, children: [] },
+        t: { type: "Text", props: { text: e.message || String(e), size: "md" }, children: [] },
       }},
     });
   }
