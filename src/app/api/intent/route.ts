@@ -24,26 +24,30 @@ export const maxDuration = 30;
 export async function POST(req: NextRequest) {
   try {
     const { input } = await req.json();
-    const res = await fetch(process.env.ANTHROPIC_BASE_URL + "/v1/messages", {
+    const baseUrl = process.env.LLM_BASE_URL || "https://www.packyapi.com/v1";
+    const apiKey = process.env.LLM_API_KEY!;
+    const model = process.env.LLM_MODEL || "claude-opus-4-6";
+
+    const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY!,
-        "anthropic-version": "2023-06-01",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5-20250514",
+        model,
         max_tokens: 2048,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: input }],
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: input },
+        ],
       }),
     });
     const json = await res.json();
-    if (!res.ok || !json.content?.[0]?.text) {
-      const errMsg = json.error?.message || JSON.stringify(json).slice(0, 200);
-      throw new Error(`API ${res.status}: ${errMsg}`);
+    if (!res.ok) {
+      throw new Error(`API ${res.status}: ${json.error?.message || JSON.stringify(json).slice(0, 200)}`);
     }
-    let text = json.content[0].text.trim();
+    let text = (json.choices?.[0]?.message?.content || "").trim();
     text = text.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
     return NextResponse.json(JSON.parse(text));
   } catch (e: any) {
