@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { defineCatalog } from "@json-render/core";
 import { schema, defineRegistry } from "@json-render/react";
 import { z } from "zod";
@@ -64,6 +65,47 @@ export const catalog = defineCatalog(schema, {
 const gapMap = { sm: "gap-1.5", md: "gap-3", lg: "gap-5" };
 const sizeMap = { sm: "text-[13px] leading-5", md: "text-[15px] leading-6", lg: "text-lg leading-7" };
 
+function InteractiveButton({ label }: { label: string }) {
+  const [clicked, setClicked] = useState(false);
+  if (clicked) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-4 py-2 text-[13px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
+        ✓ {label}
+      </span>
+    );
+  }
+  return (
+    <button
+      onClick={() => setClicked(true)}
+      className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-zinc-700 active:scale-[0.97] dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+    >
+      {label}
+    </button>
+  );
+}
+
+function InteractiveRadio({ name, options }: { name: string; options: { label: string; value: string }[] }) {
+  const [selected, setSelected] = useState<string | null>(null);
+  return (
+    <div className="flex flex-col gap-1">
+      {options.map((opt) => (
+        <label
+          key={opt.value}
+          onClick={() => setSelected(opt.value)}
+          className={`flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-[14px] transition-colors ${
+            selected === opt.value
+              ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
+              : "text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800/50"
+          }`}
+        >
+          <input type="radio" name={name} value={opt.value} checked={selected === opt.value} readOnly className="h-4 w-4 accent-zinc-900 dark:accent-white" />
+          {opt.label}
+        </label>
+      ))}
+    </div>
+  );
+}
+
 export const { registry } = defineRegistry(catalog, {
   components: {
     Card: ({ props, children }) => (
@@ -95,29 +137,13 @@ export const { registry } = defineRegistry(catalog, {
         {props.text}
       </span>
     ),
-    Button: ({ props, emit }) => (
-      <button
-        onClick={() => emit("press")}
-        className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-zinc-700 active:scale-[0.97] dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-      >
-        {props.label}
-      </button>
-    ),
-    Radio: ({ props }) => (
-      <div className="flex flex-col gap-2">
-        {props.options.map((opt: any) => (
-          <label key={opt.value} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-[14px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800/50">
-            <input type="radio" name={props.name} value={opt.value} className="h-4 w-4 accent-zinc-900 dark:accent-white" />
-            {opt.label}
-          </label>
-        ))}
-      </div>
-    ),
+    Button: ({ props }) => <InteractiveButton label={props.label} />,
+    Radio: ({ props }) => <InteractiveRadio name={props.name} options={props.options} />,
     Separator: () => <hr className="border-zinc-100 dark:border-zinc-800" />,
   },
   actions: {
-    confirm: async () => { alert("已确认！"); },
-    select_item: async () => { alert("已选择！"); },
-    filter: async () => { alert("已筛选！"); },
+    confirm: async () => {},
+    select_item: async () => {},
+    filter: async () => {},
   },
 });
