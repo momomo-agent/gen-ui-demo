@@ -73,7 +73,7 @@ export default function Home() {
                   </span>
                 )}
                 {msg.spec && (
-                  <div className="rounded-2xl rounded-tl-md border border-zinc-200/80 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:border-zinc-800 dark:bg-zinc-900">
+                  <div className="rounded-2xl rounded-tl-md border border-zinc-200/60 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:border-zinc-700/60 dark:bg-zinc-900 dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)]">
                     <JSONUIProvider registry={registry}>
                       <Renderer spec={msg.spec} registry={registry} />
                     </JSONUIProvider>

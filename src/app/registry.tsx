@@ -69,7 +69,7 @@ function InteractiveButton({ label }: { label: string }) {
   const [clicked, setClicked] = useState(false);
   if (clicked) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-4 py-2 text-[13px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
+      <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-4 py-2 text-[13px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:ring-emerald-800">
         ✓ {label}
       </span>
     );
@@ -77,7 +77,7 @@ function InteractiveButton({ label }: { label: string }) {
   return (
     <button
       onClick={() => setClicked(true)}
-      className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-zinc-700 active:scale-[0.97] dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+      className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-zinc-700 active:scale-[0.97] dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
     >
       {label}
     </button>
@@ -111,7 +111,9 @@ export const { registry } = defineRegistry(catalog, {
     Card: ({ props, children }) => (
       <div className="space-y-3">
         <p className="text-[15px] font-semibold tracking-tight">{props.title}</p>
-        {children}
+        <div className="rounded-xl bg-zinc-50 p-3.5 dark:bg-zinc-800/50">
+          {children}
+        </div>
       </div>
     ),
     Stack: ({ props, children }) => (
@@ -139,7 +141,7 @@ export const { registry } = defineRegistry(catalog, {
     ),
     Button: ({ props }) => <InteractiveButton label={props.label} />,
     Radio: ({ props }) => <InteractiveRadio name={props.name} options={props.options} />,
-    Separator: () => <hr className="border-zinc-100 dark:border-zinc-800" />,
+    Separator: () => <div className="h-px bg-zinc-100 dark:bg-zinc-700/50" />,
   },
   actions: {
     confirm: async () => {},
