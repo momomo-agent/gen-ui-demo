@@ -61,19 +61,19 @@ export const catalog = defineCatalog(schema, {
   },
 });
 
-const gapMap = { sm: "gap-1", md: "gap-3", lg: "gap-5" };
-const sizeMap = { sm: "text-sm", md: "text-base", lg: "text-lg" };
+const gapMap = { sm: "gap-1.5", md: "gap-3", lg: "gap-5" };
+const sizeMap = { sm: "text-[13px] leading-5", md: "text-[15px] leading-6", lg: "text-lg leading-7" };
 
 export const { registry } = defineRegistry(catalog, {
   components: {
     Card: ({ props, children }) => (
-      <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-        <h3 className="mb-2 font-semibold">{props.title}</h3>
+      <div className="space-y-3">
+        <p className="text-[15px] font-semibold tracking-tight">{props.title}</p>
         {children}
       </div>
     ),
     Stack: ({ props, children }) => (
-      <div className={`flex ${props.direction === "horizontal" ? "flex-row flex-wrap" : "flex-col"} ${gapMap[props.gap || "md"]}`}>
+      <div className={`flex ${props.direction === "horizontal" ? "flex-row flex-wrap items-center" : "flex-col"} ${gapMap[props.gap || "md"]}`}>
         {children}
       </div>
     ),
@@ -83,22 +83,22 @@ export const { registry } = defineRegistry(catalog, {
       </div>
     ),
     Heading: ({ props }) => (
-      <h2 className="text-2xl font-bold">{props.text}</h2>
+      <p className="text-base font-semibold tracking-tight">{props.text}</p>
     ),
     Text: ({ props }) => (
-      <p className={`${sizeMap[props.size || "md"]} ${props.color === "muted" ? "text-zinc-500" : ""} ${props.weight === "semibold" ? "font-semibold" : ""}`}>
+      <p className={`${sizeMap[props.size || "md"]} ${props.color === "muted" ? "text-zinc-400" : "text-zinc-700 dark:text-zinc-300"} ${props.weight === "semibold" ? "font-medium" : ""}`}>
         {props.text}
       </p>
     ),
     Badge: ({ props }) => (
-      <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium dark:bg-zinc-800">
+      <span className="inline-flex items-center rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 ring-1 ring-inset ring-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:ring-zinc-700">
         {props.text}
       </span>
     ),
     Button: ({ props, emit }) => (
       <button
         onClick={() => emit("press")}
-        className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900"
+        className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-zinc-700 active:scale-[0.97] dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
         {props.label}
       </button>
@@ -106,14 +106,14 @@ export const { registry } = defineRegistry(catalog, {
     Radio: ({ props }) => (
       <div className="flex flex-col gap-2">
         {props.options.map((opt: any) => (
-          <label key={opt.value} className="flex items-center gap-2 text-sm">
-            <input type="radio" name={props.name} value={opt.value} className="accent-zinc-900" />
+          <label key={opt.value} className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-[14px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800/50">
+            <input type="radio" name={props.name} value={opt.value} className="h-4 w-4 accent-zinc-900 dark:accent-white" />
             {opt.label}
           </label>
         ))}
       </div>
     ),
-    Separator: () => <hr className="border-zinc-200 dark:border-zinc-700" />,
+    Separator: () => <hr className="border-zinc-100 dark:border-zinc-800" />,
   },
   actions: {
     confirm: async () => { alert("已确认！"); },

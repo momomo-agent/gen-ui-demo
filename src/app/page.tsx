@@ -9,9 +9,9 @@ import { resolveIntent } from "./engine";
 type HandoffMode = "osHandles" | "osToUser" | "osAsksUser";
 
 const modeLabels: Record<HandoffMode, { text: string; color: string }> = {
-  osHandles: { text: "OS 直接处理", color: "bg-green-100 text-green-800" },
-  osToUser: { text: "OS → 你来选", color: "bg-blue-100 text-blue-800" },
-  osAsksUser: { text: "OS 问你", color: "bg-amber-100 text-amber-800" },
+  osHandles: { text: "OS 直接处理", color: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
+  osToUser: { text: "OS → 你来选", color: "bg-sky-50 text-sky-700 ring-sky-200" },
+  osAsksUser: { text: "OS 问你", color: "bg-amber-50 text-amber-700 ring-amber-200" },
 };
 
 interface Message {
@@ -30,12 +30,10 @@ export default function Home() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!input.trim() || loading) return;
-
     const userMsg = input.trim();
     setInput("");
     setMessages((prev) => [...prev, { role: "user", text: userMsg }]);
     setLoading(true);
-
     try {
       const res = await fetch("/api/intent", {
         method: "POST",
@@ -45,7 +43,6 @@ export default function Home() {
       const data = await res.json();
       setMessages((prev) => [...prev, { role: "os", mode: data.mode, label: data.label, spec: data.spec }]);
     } catch {
-      // Fallback to local mock
       const data = resolveIntent(userMsg);
       setMessages((prev) => [...prev, { role: "os", mode: data.mode, label: data.label, spec: data.spec }]);
     }
@@ -53,56 +50,59 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h1 className="text-lg font-semibold">IntentOS · Generative UI Demo</h1>
-        <p className="text-sm text-zinc-500">说出你的意图，OS 生成界面</p>
+    <div className="flex min-h-screen flex-col bg-[#fafafa] dark:bg-zinc-950">
+      <header className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/80 px-6 py-4 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-900/80">
+        <h1 className="text-[17px] font-semibold tracking-tight">IntentOS</h1>
+        <p className="text-[13px] text-zinc-400">说出你的意图，OS 生成界面</p>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto flex max-w-2xl flex-col gap-4">
+      <main className="flex-1 overflow-y-auto px-4 py-8">
+        <div className="mx-auto flex max-w-xl flex-col gap-5">
           {messages.map((msg, i) =>
             msg.role === "user" ? (
-              <div key={i} className="self-end rounded-2xl bg-zinc-900 px-4 py-2 text-white dark:bg-zinc-100 dark:text-zinc-900">
-                {msg.text}
+              <div key={i} className="flex justify-end">
+                <div className="max-w-[80%] rounded-2xl rounded-br-md bg-zinc-900 px-4 py-2.5 text-[15px] text-white dark:bg-zinc-100 dark:text-zinc-900">
+                  {msg.text}
+                </div>
               </div>
             ) : (
               <div key={i} className="flex flex-col gap-2">
                 {msg.mode && (
-                  <span className={`self-start rounded-full px-3 py-1 text-xs font-medium ${modeLabels[msg.mode].color}`}>
-                    {modeLabels[msg.mode].text}
+                  <span className={`self-start rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${modeLabels[msg.mode].color}`}>
+                    {msg.label || modeLabels[msg.mode].text}
                   </span>
                 )}
-                {msg.spec ? (
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                {msg.spec && (
+                  <div className="rounded-2xl rounded-tl-md border border-zinc-200/80 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:border-zinc-800 dark:bg-zinc-900">
                     <JSONUIProvider registry={registry}>
                       <Renderer spec={msg.spec} registry={registry} />
                     </JSONUIProvider>
                   </div>
-                ) : (
-                  <div className="text-zinc-600">{msg.text}</div>
                 )}
               </div>
             )
           )}
           {loading && (
-            <div className="text-sm text-zinc-400">OS 思考中...</div>
+            <div className="flex items-center gap-2 text-[13px] text-zinc-400">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-zinc-300" />
+              OS 思考中...
+            </div>
           )}
         </div>
       </main>
 
-      <form onSubmit={handleSubmit} className="border-t border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="mx-auto flex max-w-2xl gap-3">
+      <form onSubmit={handleSubmit} className="sticky bottom-0 border-t border-zinc-200/80 bg-white/80 px-4 py-4 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-900/80">
+        <div className="mx-auto flex max-w-xl gap-2.5">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="说出你的意图... 试试「点个拿铁」「点外卖」「天气」「订会议室」"
-            className="flex-1 rounded-xl border border-zinc-300 bg-zinc-50 px-4 py-3 text-sm outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-800"
+            placeholder="说出你的意图..."
+            className="flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[15px] outline-none transition-colors placeholder:text-zinc-300 focus:border-zinc-400 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:focus:border-zinc-600"
           />
           <button
             type="submit"
             disabled={loading}
-            className="rounded-xl bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+            className="rounded-xl bg-zinc-900 px-5 py-3 text-[14px] font-medium text-white shadow-sm transition-all hover:bg-zinc-700 active:scale-[0.97] disabled:opacity-40 dark:bg-white dark:text-zinc-900"
           >
             发送
           </button>
