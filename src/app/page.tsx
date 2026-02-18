@@ -97,7 +97,7 @@ export default function Home() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="说出你的意图..."
-            className="flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[15px] outline-none transition-colors placeholder:text-zinc-300 focus:border-zinc-400 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:focus:border-zinc-600"
+            className="flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[15px] outline-none transition-colors placeholder:text-zinc-300 focus:border-zinc-400 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500 dark:focus:bg-zinc-800"
           />
           <button
             type="submit"
