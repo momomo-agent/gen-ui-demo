@@ -39,8 +39,11 @@ export async function POST(req: NextRequest) {
       }),
     });
     const json = await res.json();
-    let text = (json.content?.[0]?.text || "").trim();
-    // Strip markdown code fences if present
+    if (!res.ok || !json.content?.[0]?.text) {
+      const errMsg = json.error?.message || JSON.stringify(json).slice(0, 200);
+      throw new Error(`API ${res.status}: ${errMsg}`);
+    }
+    let text = json.content[0].text.trim();
     text = text.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
     return NextResponse.json(JSON.parse(text));
   } catch (e: any) {
