@@ -51,9 +51,9 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#fafafa] dark:bg-zinc-950">
-      <header className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/80 px-6 py-4 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-900/80">
-        <h1 className="text-[17px] font-semibold tracking-tight">IntentOS</h1>
-        <p className="text-[13px] text-zinc-400">说出你的意图，OS 生成界面</p>
+      <header className="sticky top-0 z-10 border-b border-zinc-200/80 bg-white/90 px-6 py-4 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-900/90">
+        <h1 className="text-[17px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">IntentOS</h1>
+        <p className="text-[13px] text-zinc-400 dark:text-zinc-500">说出你的意图，OS 生成界面</p>
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 py-8">
@@ -61,7 +61,7 @@ export default function Home() {
           {messages.map((msg, i) =>
             msg.role === "user" ? (
               <div key={i} className="flex justify-end">
-                <div className="max-w-[80%] rounded-2xl rounded-br-md bg-zinc-900 px-4 py-2.5 text-[15px] text-white dark:bg-zinc-100 dark:text-zinc-900">
+                <div className="bubble-user max-w-[80%] rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] text-white dark:text-zinc-900">
                   {msg.text}
                 </div>
               </div>
@@ -73,7 +73,7 @@ export default function Home() {
                   </span>
                 )}
                 {msg.spec && (
-                  <div className="rounded-2xl rounded-tl-md border border-zinc-200/60 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:border-zinc-700/60 dark:bg-zinc-900 dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)]">
+                  <div className={`card-os ${msg.mode === 'osHandles' ? 'card-os-handles' : msg.mode === 'osToUser' ? 'card-os-to-user' : 'card-os-asks-user'} rounded-2xl rounded-tl-md border border-zinc-200/60 p-5 dark:border-zinc-700/60`}>
                     <JSONUIProvider registry={registry}>
                       <Renderer spec={msg.spec} registry={registry} />
                     </JSONUIProvider>
@@ -91,13 +91,13 @@ export default function Home() {
         </div>
       </main>
 
-      <form onSubmit={handleSubmit} className="sticky bottom-0 border-t border-zinc-200/80 bg-white/80 px-4 py-4 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-900/80">
+      <form onSubmit={handleSubmit} className="sticky bottom-0 border-t border-zinc-200/80 bg-white/90 px-4 py-4 backdrop-blur-xl dark:border-zinc-800/80 dark:bg-zinc-900/90">
         <div className="mx-auto flex max-w-xl gap-2.5">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="说出你的意图..."
-            className="flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[15px] outline-none transition-colors placeholder:text-zinc-300 focus:border-zinc-400 focus:bg-white dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500 dark:focus:bg-zinc-800"
+            className="flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[15px] outline-none transition-colors placeholder:text-zinc-300 focus:border-zinc-400 focus:ring-1 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-500 dark:focus:ring-zinc-700"
           />
           <button
             type="submit"
